@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XD</title>
+<style>
+* { margin: 0; padding: 0; }
+body {
+    background: #000;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+}
+.flying {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    pointer-events: none;
+    user-select: none;
+}
+#counter {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    color: lime;
+    font: bold 18px Arial;
+    z-index: 9999;
+    pointer-events: none;
+}
+</style>
+</head>
+<body>
+
+<div id="counter">ILOŚĆ: 1</div>
+
+<script>
+const image = "obraz.jpg";
+const creatures = [];
+
+function createCreature() {
+    const img = document.createElement("img");
+    img.src = image;
+    img.className = "flying";
+    document.body.appendChild(img);
+
+    creatures.push({
+        img,
+        x: Math.random() * (innerWidth - 150),
+        y: Math.random() * (innerHeight - 150),
+        dx: (Math.random() * 10 + 4) * (Math.random() < .5 ? -1 : 1),
+        dy: (Math.random() * 10 + 4) * (Math.random() < .5 ? -1 : 1),
+        size: 150
+    });
+
+    updateCounter();
+}
+
+function updateCounter() {
+    document.getElementById("counter").textContent =
+        "ILOŚĆ: " + creatures.length;
+}
+
+function animate() {
+    for (const c of creatures) {
+        c.x += c.dx;
+        c.y += c.dy;
+
+        if (c.x <= 0 || c.x + c.size >= innerWidth) {
+            c.dx *= -1;
+        }
+
+        if (c.y <= 0 || c.y + c.size >= innerHeight) {
+            c.dy *= -1;
+        }
+
+        c.x = Math.max(0, Math.min(c.x, innerWidth - c.size));
+        c.y = Math.max(0, Math.min(c.y, innerHeight - c.size));
+
+        c.img.style.left = c.x + "px";
+        c.img.style.top = c.y + "px";
+    }
+
+    requestAnimationFrame(animate);
+}
+
+// Start automatyczny
+createCreature();
+animate();
+
+// Kliknięcie dodaje kolejne kopie
+document.addEventListener("click", () => {
+    if (creatures.length < 40) {
+        createCreature();
+    }
+});
+
+// Dopasowanie po zmianie rozmiaru okna
+window.addEventListener("resize", () => {
+    for (const c of creatures) {
+        c.x = Math.min(c.x, innerWidth - c.size);
+        c.y = Math.min(c.y, innerHeight - c.size);
+    }
+});
+</script>
+
+</body>
+</html>
